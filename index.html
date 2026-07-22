@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasarapu Pranay | Professional Photo & Video Editor</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Three.js for 3D Background Effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #08080a;
+            --card-bg: rgba(20, 20, 25, 0.65);
+            --gold-primary: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-gradient: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7);
+            --text-main: #F5F5F7;
+            --text-muted: #A1A1AA;
+            --border-gold: rgba(212, 175, 55, 0.25);
+            --glass-blur: blur(16px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .brand-logo {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* 3D Canvas Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism Reusable Card */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-gold);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.15);
+        }
+
+        /* Gold Gradient Text */
+        .gold-text {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* Navigation Bar */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 20px 8%;
+            background: rgba(8, 8, 10, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-main);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold-light);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-gold {
+            background: var(--gold-gradient);
+            color: #000;
+            border: none;
+            font-weight: 700;
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-gold);
+        }
+
+        .btn-outline:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--gold-primary);
+            color: var(--gold-light);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            padding: 140px 8% 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 50px;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero-subtitle {
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold-primary);
+            margin-bottom: 12px;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero-description {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 35px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .hero-avatar-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-avatar {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-gold);
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .hero-avatar:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 70px rgba(212, 175, 55, 0.4);
+            border-color: var(--gold-primary);
+        }
+
+        /* Section Layouts */
+        section {
+            padding: 100px 8%;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* About Section */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .about-info-card {
+            padding: 40px;
+        }
+
+        .location-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gold-primary);
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .service-card {
+            padding: 35px 25px;
+            text-align: center;
+        }
+
+        .service-icon {
+            font-size: 2.2rem;
+            color: var(--gold-primary);
+            margin-bottom: 20px;
+        }
+
+        .service-title {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+
+        .service-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Image Gallery */
+        .gallery-filters {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 22px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-gold);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--gold-gradient);
+            color: #000;
+            font-weight: 600;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 280px;
+            cursor: pointer;
+        }
+
+        .gallery-item img, .gallery-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-placeholder {
+            background: linear-gradient(135deg, #181820, #0c0c10);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-muted);
+            border: 1px dashed var(--border-gold);
+        }
+
+        .gallery-item:hover img, .gallery-item:hover .gallery-placeholder {
+            transform: scale(1.08);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(8, 8, 10, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        /* Lightbox Modal */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 85vh;
+            border-radius: 8px;
+            border: 1px solid var(--gold-primary);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            color: var(--gold-light);
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-card {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .skill-card i {
+            font-size: 2rem;
+            color: var(--gold-primary);
+            margin-bottom: 12px;
+        }
+
+        /* Contact Section */
+        .contact-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* Floating WhatsApp Action */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #25d366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 0px 5px 20px rgba(0,0,0,0.4);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 8%;
+            border-top: 1px solid var(--border-gold);
+            background: #040405;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 20px;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--gold-primary);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 992px) {
+            .hero, .about-grid {
+                flex-direction: column;
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-title {
+                font-size: 2.6rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-avatar {
+                width: 250px;
+                height: 250px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Canvas Background Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/917207455422?text=Hi%20Pranay,%20I%20would%20like%20to%20discuss%20an%20editing%20project." class="whatsapp-float" target="_blank" title="Contact on WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- Navigation Header -->
+    <header>
+        <a href="#home" class="brand-logo">PRANAY<span class="gold-text">.EDIT</span></a>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <p class="hero-subtitle">Cinematic & Luxury Visuals</p>
+            <h1 class="hero-title">Kasarapu <span class="gold-text">Pranay</span></h1>
+            <p class="hero-description">Professional Photo & Video Editor specializing in high-end Wedding Editing, Marriage Cinematics, Photo Retouching, and Viral Reels.</p>
+            <div class="hero-buttons">
+                <a href="#gallery" class="btn btn-gold"><i class="fa-solid fa-images"></i> View Gallery</a>
+                <a href="https://wa.me/917207455422?text=Hi%20Pranay,%20I%20want%20to%20book%20a%20service." target="_blank" class="btn btn-outline"><i class="fa-brands fa-whatsapp"></i> WhatsApp Me</a>
+            </div>
+        </div>
+        <div class="hero-avatar-wrapper">
+            <img src="pranay.png" alt="Kasarapu Pranay" class="hero-avatar" onerror="this.onerror=null; this.src='https://via.placeholder.com/320x320/141419/D4AF37?text=Pranay.png';">
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="section-header">
+            <h2 class="section-title">About <span class="gold-text">Me</span></h2>
+            <p class="section-subtitle">Crafting timeless stories through precision editing</p>
+        </div>
+        <div class="about-grid">
+            <div style="text-align: center;">
+                <img src="pranay.png" alt="Kasarapu Pranay Profile" class="hero-avatar" style="width: 260px; height: 260px;" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x260/141419/D4AF37?text=Pranay.png';">
+            </div>
+            <div class="glass-card about-info-card">
+                <p class="location-tag"><i class="fa-solid fa-location-dot"></i> Kodimial, Telangana, India</p>
+                <h3 style="font-size: 1.8rem; margin-bottom: 15px;">Visual Storyteller & Editor</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    I turn raw wedding clips, photos, and video moments into luxury cinematic masterpieces. With specialized knowledge in color grading, high-end skin retouching, and quick-cut Instagram Reels, I bring a premium tone to every visual frame.
+                </p>
+                <p style="color: var(--text-muted); margin-bottom: 25px;">
+                    Whether it's an elaborate marriage ceremony or dynamic short-form media, my aim is perfection and gold-standard client satisfaction.
+                </p>
+                <a href="https://www.instagram.com/p/DaakeREFE77/?hl=en&img_index=1" target="_blank" class="btn btn-outline"><i class="fa-brands fa-instagram"></i> Featured Instagram Post</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="section-header">
+            <h2 class="section-title">My <span class="gold-text">Services</span></h2>
+            <p class="section-subtitle">Tailored Editing Solutions for Weddings & Digital Content</p>
+        </div>
+        <div class="services-grid">
+            <div class="glass-card service-card">
+                <i class="fa-solid fa-ring service-icon"></i>
+                <h3 class="service-title">Wedding Editing</h3>
+                <p class="service-desc">Complete cinematic wedding films, highlights, and teaser cuts crafted with emotional storytelling.</p>
+            </div>
+            <div class="glass-card service-card">
+                <i class="fa-solid fa-heart service-icon"></i>
+                <h3 class="service-title">Marriage Editing</h3>
+                <p class="service-desc">Specialized editing tailored for traditional & modern marriage ceremonies and pre-wedding shoots.</p>
+            </div>
+            <div class="glass-card service-card">
+                <i class="fa-solid fa-wand-magic-sparkles service-icon"></i>
+                <h3 class="service-title">Photo Retouching</h3>
+                <p class="service-desc">High-end skin smoothing, color balance, and detail enhancement for high-resolution portraits.</p>
+            </div>
+            <div class="glass-card service-card">
+                <i class="fa-solid fa-mobile-screen-button service-icon"></i>
+                <h3 class="service-title">Reels Editing</h3>
+                <p class="service-desc">Fast-paced, high-engagement Instagram Reels with viral music sync and custom transitions.</p>
+            </div>
+            <div class="glass-card service-card">
+                <i class="fa-solid fa-book-open service-icon"></i>
+                <h3 class="service-title">Album Design</h3>
+                <p class="service-desc">Luxury, custom-designed photo albums tailored for print and high-res digital preview.</p>
+            </div>
+            <div class="glass-card service-card">
+                <i class="fa-solid fa-sliders service-icon"></i>
+                <h3 class="service-title">Color Grading</h3>
+                <p class="service-desc">Professional cinematic color styling, LUT application, and tone correction for video & photos.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery">
+        <div class="section-header">
+            <h2 class="section-title">Image <span class="gold-text">Gallery</span></h2>
+            <p class="section-subtitle">Click images to preview in high definition</p>
+        </div>
+        
+        <div class="gallery-filters">
+            <button class="filter-btn active" onclick="filterGallery('all')">All Works</button>
+            <button class="filter-btn" onclick="filterGallery('wedding')">Weddings</button>
+            <button class="filter-btn" onclick="filterGallery('retouch')">Retouching</button>
+            <button class="filter-btn" onclick="filterGallery('reels')">Reels Covers</button>
+        </div>
+
+        <div class="gallery-grid">
+            <!-- Sample Placeholder Cards Ready for Your Images -->
+            <div class="glass-card gallery-item wedding" onclick="openLightbox('https://via.placeholder.com/1200x800/141419/D4AF37?text=Wedding+Sample+1')">
+                <div class="gallery-placeholder">
+                    <i class="fa-solid fa-camera" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>Wedding Project</p>
+                </div>
+                <div class="gallery-overlay">
+                    <i class="fa-solid fa-magnifying-glass-plus" style="font-size: 1.5rem; color: var(--gold-primary);"></i>
+                </div>
+            </div>
+
+            <div class="glass-card gallery-item retouch" onclick="openLightbox('https://via.placeholder.com/1200x800/141419/D4AF37?text=Photo+Retouch+Sample')">
+                <div class="gallery-placeholder">
+                    <i class="fa-solid fa-image" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>Photo Retouching</p>
+                </div>
+                <div class="gallery-overlay">
+                    <i class="fa-solid fa-magnifying-glass-plus" style="font-size: 1.5rem; color: var(--gold-primary);"></i>
+                </div>
+            </div>
+
+            <div class="glass-card gallery-item reels" onclick="openLightbox('https://via.placeholder.com/1200x800/141419/D4AF37?text=Reels+Cover+Sample')">
+                <div class="gallery-placeholder">
+                    <i class="fa-solid fa-clapperboard" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>Reels Cover</p>
+                </div>
+                <div class="gallery-overlay">
+                    <i class="fa-solid fa-magnifying-glass-plus" style="font-size: 1.5rem; color: var(--gold-primary);"></i>
+                </div>
+            </div>
+
+            <div class="glass-card gallery-item wedding" onclick="openLightbox('https://via.placeholder.com/1200x800/141419/D4AF37?text=Marriage+Cinematic+Sample')">
+                <div class="gallery-placeholder">
+                    <i class="fa-solid fa-film" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>Marriage Film</p>
+                </div>
+                <div class="gallery-overlay">
+                    <i class="fa-solid fa-magnifying-glass-plus" style="font-size: 1.5rem; color: var(--gold-primary);"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills">
+        <div class="section-header">
+            <h2 class="section-title">Technical <span class="gold-text">Skills</span></h2>
+            <p class="section-subtitle">Software & Creative Expertise</p>
+        </div>
+        <div class="skills-grid">
+            <div class="glass-card skill-card">
+                <i class="fa-solid fa-photo-film"></i>
+                <h3>Adobe Premiere Pro</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Video Editing & Timeline Mastery</p>
+            </div>
+            <div class="glass-card skill-card">
+                <i class="fa-solid fa-palette"></i>
+                <h3>Adobe Photoshop</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Advanced Retouching & Compositing</p>
+            </div>
+            <div class="glass-card skill-card">
+                <i class="fa-solid fa-sun"></i>
+                <h3>Lightroom Classic</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Batch Color Corrections & Tone Curve</p>
+            </div>
+            <div class="glass-card skill-card">
+                <i class="fa-solid fa-compact-disc"></i>
+                <h3>DaVinci Resolve</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Professional Color Grading</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="glass-card contact-container">
+            <h2 class="section-title">Let's Create <span class="gold-text">Magic</span> Together</h2>
+            <p style="color: var(--text-muted); margin-top: 10px;">Available for wedding edits, color grading projects, and custom Instagram media works.</p>
+            <p style="color: var(--gold-primary); margin-top: 15px; font-weight: 600;"><i class="fa-solid fa-location-pin"></i> Kodimial, Telangana, India</p>
+
+            <div class="social-buttons">
+                <a href="https://wa.me/917207455422?text=Hi%20Pranay,%20I'm%20interested%20in%20your%20services." target="_blank" class="btn btn-gold">
+                    <i class="fa-brands fa-whatsapp"></i> +91 7207455422
+                </a>
+                <a href="https://www.instagram.com/bunny_goud_official/" target="_blank" class="btn btn-outline">
+                    <i class="fa-brands fa-instagram"></i> @bunny_goud_official
+                </a>
+                <a href="https://www.instagram.com/kodimial_yellamma_/" target="_blank" class="btn btn-outline">
+                    <i class="fa-brands fa-instagram"></i> @kodimial_yellamma_
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <ul class="footer-links">
+            <li><a href="https://wa.me/917207455422" target="_blank">WhatsApp</a></li>
+            <li><a href="https://www.instagram.com/bunny_goud_official/" target="_blank">Instagram (Main)</a></li>
+            <li><a href="https://www.instagram.com/kodimial_yellamma_/" target="_blank">Instagram (Community)</a></li>
+            <li><a href="https://www.instagram.com/p/DbFT_2oupMr/?hl=en" target="_blank">Video Edit Link</a></li>
+        </ul>
+        <p>&copy; 2026 Kasarapu Pranay. All Rights Reserved. | Location: Kodimial, Telangana</p>
+    </footer>
+
+    <!-- Lightbox Modal Container -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" class="lightbox-content" src="" alt="Lightbox Preview">
+    </div>
+
+    <!-- Interactive Scripts -->
+    <script>
+        /* 1. THREE.JS Interactive 3D Gold Particle System Background */
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // Create Gold Particles
+        const particlesCount = 350;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+
+        const goldColor = new THREE.Color(0xD4AF37);
+
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 15;
+            positions[i + 1] = (Math.random() - 0.5) * 15;
+            positions[i + 2] = (Math.random() - 0.5) * 15;
+
+            colors[i] = goldColor.r;
+            colors[i + 1] = goldColor.g;
+            colors[i + 2] = goldColor.b;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.04,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.7
+        });
+
+        const particlesMesh = new THREE.Points(geometry, material);
+        scene.add(particlesMesh);
+
+        camera.position.z = 5;
+
+        // Mouse Interactivity
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) - 0.5;
+            mouseY = (e.clientY / window.innerHeight) - 0.5;
+        });
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            particlesMesh.rotation.y += 0.0015;
+            particlesMesh.rotation.x += 0.001;
+
+            particlesMesh.rotation.y += mouseX * 0.02;
+            particlesMesh.rotation.x += mouseY * 0.02;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Responsive Resizing
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        /* 2. Gallery Lightbox Functionality */
+        function openLightbox(imageSrc) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = imageSrc;
+            lightbox.style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+
+        /* 3. Gallery Category Filters */
+        function filterGallery(category) {
+            const items = document.querySelectorAll('.gallery-item');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            items.forEach(item => {
+                if (category === 'all' || item.classList.contains(category)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
